@@ -7,6 +7,7 @@ This is a demo of AWS dynamo db client. It can connect to DynamoDB and do basic 
 # Chinese Notes
 ## 配置方法：
 打开aws.js文件，主要修改options.endpoint即可，也可以修改sqs、sns的链接地址。
+![](https://github.com/yuqiu314/dynamo-express/blob/master/raw/Picture1.png)
 
 ## 启动方法：
 `npm install`
@@ -14,16 +15,19 @@ This is a demo of AWS dynamo db client. It can connect to DynamoDB and do basic 
 `npm run serve`
 
 看到如下界面说明启动成功：
-
+![](https://github.com/yuqiu314/dynamo-express/blob/master/raw/Picture2.png)
 
 ## 使用方法：
 在浏览器中输入“localhost:4000”，就可以看到所链接的DynamoDB的所有表格。
 可以点击查看、删除、新建表格。（Export还没来得及做）
+![](https://github.com/yuqiu314/dynamo-express/blob/master/raw/Picture3.png)
 
 点击表格查看以后，可以对表格进行增删改查。时间不够，做的比较粗糙，json还是需要自己写的。
-
+![](https://github.com/yuqiu314/dynamo-express/blob/master/raw/Picture4.png)
+![](https://github.com/yuqiu314/dynamo-express/blob/master/raw/Picture5.png)
 
 点击Enable Stream以后就会打开一个child process进行监听，并将消息发送给sqs进程，格式化打印。
+![](https://github.com/yuqiu314/dynamo-express/blob/master/raw/Picture6.png)
 
 ## 基本要点：
 *	基于nodejs+express的简单网站，完成包括tables和items的增删改查基本功能，提供编辑json的界面
