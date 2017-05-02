@@ -1,0 +1,401 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ Table.TableName }}{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+  .tab-pane > form {
+    padding-bottom: 5px;
+  }
+
+  .sorting-button {
+    white-space: nowrap;
+  }
+
+  @media (min-width: 992px) { /* meduim and up */
+    #advanced .form-group .btn {
+      height: 150px;
+    }
+  }
+
+  #indexes td {
+    vertical-align: middle;
+  }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+  <li>
+    <a href="{{ baseHref }}table/{{ Table.TableName }}">Tables:</a>
+  </li>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ Table.TableName }}<span class="caret"></span></a>
+    <ul class="dropdown-menu">
+      {% for c in TableNames %}
+      <li><a href="{{ baseHref }}table/{{ c }}">{{ c }}</a></li>
+      {% endfor %}
+    </ul>
+  </li>
+{% endblock %}
+
+{% block content %}
+
+<!-- Add Document Modal -->
+  <div class="modal fade" id="editJsonContent" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <form method="post" id="editJsonContentForm">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal">×</button>
+        <h2 id="editJsonContentTitle">Put Single Item</h2>
+      </div>
+      <div class="modal-body">
+        <textarea id="document" name="document"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-error" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success" id="editJsonContentBtn">
+          <span class="glyphicon glyphicon-pencil"></span>
+          Submit
+        </button>
+      </div>
+    </form>
+    </div>
+    </div>
+  </div>
+<!-- End Add Document Modal -->
+
+  {% if Table.AttributeDefinitions.length == 0 %}
+    <p class="well">
+      No content found.
+    </p>
+  {% else %}
+
+  <div class="fadeToWhite" id="fadeToWhiteID"></div>
+  <div class="table-responsive tableWrapper">
+    <table class="table table-striped tableHeaderFooterBars">
+      <thead>
+        {% for column in columns %}
+          <th class="sorting-button" data-column="{{column}}" data-direction="{{sort[column]}}" title="Sort by {{column}}">
+            {{column}}
+            {% if sort[column] == 1 %}
+              <span class="glyphicon glyphicon-triangle-top"></span>
+            {% elseif sort[column] == -1 %}
+              <span class="glyphicon glyphicon-triangle-bottom"></span>
+            {% endif %}
+          </th>
+        {% endfor %}
+      </thead>
+      {% for document in Table.AttributeDefinitions %}
+        <tr onclick="">
+            <td><div class="tableContent">
+              <span>{{ document.AttributeName }}</span>
+            </div></td>
+            <td><div class="tableContent">
+              <span>{{ document.AttributeType }}</span>
+            </div></td>
+            <td><div class="tableContent">
+              {% for keyschema in Table.KeySchema %}
+                {% if keyschema.AttributeName == document.AttributeName %}
+                <span>{{ keyschema.KeyType }}</span>
+                {% endif %}
+              {% endfor %}
+            </div></td>
+            <td><div class="tableContent">
+              {% for gsi in Table.GlobalSecondaryIndexes %}
+                {% for keyschema in gsi.KeySchema %}
+                  {% if keyschema.AttributeName == document.AttributeName %}
+                  <span>{{ keyschema.KeyType }}</span>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </div></td>
+            <td><div class="tableContent">
+              {% for lsi in Table.LocalSecondaryIndexes %}
+                {% for keyschema in lsi.KeySchema %}
+                  {% if keyschema.AttributeName == document.AttributeName %}
+                  <span>{{ keyschema.KeyType }}</span>
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            </div></td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  {% endif %}
+
+  </div>
+  <h2>Tools</h2>
+  <div class="row">
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+      <a class="btn btn-primary btn-block" data-toggle="modal" data-target="#editJsonContent" onclick="passInfoToModal(0)">
+        <span class="glyphicon glyphicon-floppy-save"></span><br>Get Single Item
+      </a>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+      <a class="btn btn-primary btn-block" data-toggle="modal" data-target="#editJsonContent" onclick="passInfoToModal(1)">
+        <span class="glyphicon glyphicon-floppy-save"></span><br>Batch Get Items
+      </a>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+      <a class="btn btn-success btn-block" data-toggle="modal" data-target="#editJsonContent" onclick="passInfoToModal(2)">
+        <span class="glyphicon glyphicon-pencil"></span><br>Put Single Item
+      </a>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+      <a class="btn btn-success btn-block" data-toggle="modal" data-target="#editJsonContent" onclick="passInfoToModal(3)">
+        <span class="glyphicon glyphicon-pencil"></span><br>Batch Put Items
+      </a>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+        <a class="btn btn-danger btn-block" data-toggle="modal" data-target="#editJsonContent" onclick="passInfoToModal(4)">
+          <span class="glyphicon glyphicon-trash"></span><br>Delete Single Item
+        </a>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+        <a class="btn btn-danger btn-block" data-toggle="modal" data-target="#editJsonContent" onclick="passInfoToModal(5)">
+          <span class="glyphicon glyphicon-trash"></span><br>Batch Delete Items
+        </a>
+      </div>
+    </div>
+
+    {% if Table.StreamSpecification.StreamEnabled %}
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+        <a class="btn btn-warning btn-block" onclick="disableStream('{{Table.TableName}}')">
+          <span class="glyphicon glyphicon-pencil"></span><br>Disable Stream
+        </a>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-sm-6 col-lg-3">
+      <div class="well">
+        <a class="btn btn-primary btn-block" onclick="enableStream('{{Table.TableName}}')">
+          <span class="glyphicon glyphicon-pencil"></span><br>Enable Stream
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  <div class="stats col-md-12">
+    <h2>Table {{ Table.TableName }} Stats</h2>
+    <table class="table table-bordered table-striped">
+      <tr>
+        <td>
+          <strong>ItemCount</strong>
+        </td>
+        <td>
+          {{ Table.ItemCount }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>TableSizeBytes</strong>
+        </td>
+        <td>
+          {{ Table.TableSizeBytes|convertBytes }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>TableStatus</strong>
+        </td>
+        <td>
+          {{ Table.TableStatus }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>CreationDateTime</strong>
+        </td>
+        <td>
+          {{ Table.CreationDateTime|to_string }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>TableArn</strong>
+        </td>
+        <td>
+          {{ Table.TableArn }}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="col-md-12">
+    <h2>ProvisionedThroughput</h2>
+    <table class="table table-bordered table-striped">
+      <tr>
+        <td>
+          <strong>ReadCapacityUnits</strong>
+        </td>
+        <td>
+          {{ Table.ProvisionedThroughput.ReadCapacityUnits }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>WriteCapacityUnits</strong>
+        </td>
+        <td>
+          {{ Table.ProvisionedThroughput.WriteCapacityUnits }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>NumberOfDecreasesToday</strong>
+        </td>
+        <td>
+          {{ Table.ProvisionedThroughput.NumberOfDecreasesToday }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>LastIncreaseDateTime</strong>
+        </td>
+        <td>
+          {{ Table.ProvisionedThroughput.LastIncreaseDateTime|to_string }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>LastDecreaseDateTime</strong>
+        </td>
+        <td>
+          {{ Table.ProvisionedThroughput.LastDecreaseDateTime|to_string }}
+        </td>
+      </tr>
+    </table>
+  </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script type="text/javascript">
+'use strict';
+window.JSONScript = [
+  "{\n\
+  TableName: '{{ Table.TableName }}',\n\
+  Key: {\n\
+{% for keyschema in Table.KeySchema %}\
+    {{ keyschema.AttributeName }}: '',\n\
+{% endfor %}\
+  },\n\
+  AttributesToGet: [\n\
+{% for document in Table.AttributeDefinitions %}\
+    '{{ document.AttributeName }}',\n\
+{% endfor %}\
+  ]\n\
+}",
+
+  "{\n\
+  RequestItems: {\n\
+    {{ Table.TableName }}: {\n\
+      Keys: [{\n\
+{% for keyschema in Table.KeySchema %}\
+        {{ keyschema.AttributeName }}: '',\n\
+{% endfor %}\
+      }, {\n\
+{% for keyschema in Table.KeySchema %}\
+        {{ keyschema.AttributeName }}: '',\n\
+{% endfor %}\
+      }],\n\
+      AttributesToGet: [\n\
+{% for document in Table.AttributeDefinitions %}\
+        '{{ document.AttributeName }}',\n\
+{% endfor %}\
+      ],\n\
+      ConsistentRead: false\n\
+    },\n\
+  }\n\
+}",
+
+  "{\n\
+  TableName: '{{ Table.TableName }}',\n\
+  Item: {\n\
+{% for document in Table.AttributeDefinitions %}\
+    {{ document.AttributeName }}: '',\n\
+{% endfor %}\
+  }\n\
+}",
+
+  "{\n\
+  RequestItems: {\n\
+    {{ Table.TableName }}: [{\n\
+      PutRequest: {\n\
+        Item: {\n\
+{% for document in Table.AttributeDefinitions %}\
+            {{ document.AttributeName }}: '',\n\
+{% endfor %}\
+        }\n\
+      }\n\
+    }, {\n\
+      PutRequest: {\n\
+          Item: {\n\
+{% for document in Table.AttributeDefinitions %}\
+            {{ document.AttributeName }}: '',\n\
+{% endfor %}\
+          }\n\
+        }\n\
+    }],\n\
+  }\n\
+}",
+
+  "{\n\
+  TableName: '{{ Table.TableName }}',\n\
+  Key: {\n\
+{% for keyschema in Table.KeySchema %}\
+  {{ keyschema.AttributeName }}: '',\n\
+{% endfor %}\
+  },\n\
+  AttributesToGet: [\n\
+{% for document in Table.AttributeDefinitions %}\
+  '{{ document.AttributeName }}',\n\
+{% endfor %}\
+  ]\n\
+}",
+
+"{\n\
+RequestItems: {\n\
+  {{ Table.TableName }}: [{\n\
+    DeleteRequest: {\n\
+      Key: {\n\
+{% for keyschema in Table.KeySchema %}\
+        {{ keyschema.AttributeName }}: '',\n\
+{% endfor %}\
+      },\n\
+    }\n\
+  }, {\n\
+    DeleteRequest: {\n\
+      Key: {\n\
+{% for keyschema in Table.KeySchema %}\
+        {{ keyschema.AttributeName }}: '',\n\
+{% endfor %}\
+      },\n\
+      }\n\
+  }],\n\
+}\n\
+}",
+
+]
+</script>
+<script src="{{ baseHref }}public/js/table.js"></script>
+{% endblock %}

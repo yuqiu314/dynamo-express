@@ -1,0 +1,26 @@
+{
+  "name": "AWSDynamodb-homework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "nodemon index.js",
+    "mon-db": "nodemon mon-db.js",
+    "mon-sqs": "nodemon mon-sqs.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.34.0",
+    "body-parser": "^1.17.1",
+    "co": "^4.6.0",
+    "express": "^4.15.2",
+    "lodash": "^4.17.4",
+    "swig-templates": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
