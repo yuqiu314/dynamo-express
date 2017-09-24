@@ -2,7 +2,20 @@
 This is a demo of AWS dynamo db client. It can connect to DynamoDB and do basic operations.
 
 # English Notes
-// todo
+## First of all
+You need to have [nodejs](https://nodejs.org/) installed.
+
+## How to start
+Enter the source code root directory. Then input the following commands.
+
+`npm install`
+
+`npm run serve`
+
+## How to see
+When you see "[Web Server]listerning for request..."
+
+Open your browser and go to `http://localhost:4000`
 
 # Chinese Notes
 ## 配置方法：
